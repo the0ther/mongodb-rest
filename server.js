@@ -19,7 +19,7 @@ var config = { "db": {
     'port': 3000,
     'address': "0.0.0.0"
   },
-  'flavor': "regular",
+  'flavor': "nounderscore",
   'debug': true
 };
 
@@ -33,6 +33,8 @@ try {
 
 module.exports.config = config;
 
+console.log(config);
+
 app.configure(function(){
     app.use(express.bodyParser());
     app.use(express.static(process.cwd() + '/public'));
@@ -41,9 +43,26 @@ app.configure(function(){
     app.set('view engine', 'jade');
 	
 	if (config.accessControl){
+    console.log('inside of the access control block');
 		var accesscontrol = require('./lib/accesscontrol');
 		app.use(accesscontrol.handle);
 	}	
+});
+
+/**
+ * CORS support.
+ */
+app.use(function (req, res, next) {
+        //console.log('entering the CORS section');
+        res.header('Access-Control-Allow-Origin', '*');
+        res.header('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type');
+
+        // respond immediately on OPTIONS/preflighting
+        if (req.method === 'OPTIONS') {
+                res.send(200);
+        } else {
+                next();
+        }
 });
 
 require('./lib/main');
